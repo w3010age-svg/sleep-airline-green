@@ -272,32 +272,6 @@ app.post('/api/flight/takeoff', async (req, res) => {
       relatedPassenger: socialCue.relatedPassenger ?? '',
     });
 
-    try {
-      const foodGen = await generateLandingFood(
-        arrival.city,
-        arrival.country,
-        arrival.displayName,
-        activeFlight.flightId
-      );
-      if (foodGen) {
-        landingFood = {
-          entryId: `FOOD-${activeFlight.flightId}`,
-          flightId: activeFlight.flightId,
-          passengerId: passenger.passengerId,
-          passengerName: passenger.name,
-          groupId: passenger.groupId,
-          arrivalLocation: arrival.displayName,
-          country: arrival.country,
-          imageUrl: `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
-          imagePrompt: foodGen.imagePrompt,
-          recommendation: `抵達 ${arrival.displayName} 後，推薦試試當地特色料理。`,
-          landingTime,
-          createdAt: new Date().toISOString(),
-        };
-      }
-    } catch (foodErr) {
-      console.error('Landing food generation failed:', foodErr);
-    }
 
     res.json({
       flight: {
@@ -423,7 +397,6 @@ app.post('/api/flight/land', async (req, res) => {
     });
 
     let landingScenery = null;
-    let landingFood = null;
     try {
       const sceneryGen = await generateLandingScenery(
         arrival.city,
@@ -468,7 +441,7 @@ app.post('/api/flight/land', async (req, res) => {
         relatedPassenger: socialCue.relatedPassenger,
       },
       landingScenery,
-      landingFood,
+      landingFood: null,
     });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : '未知錯誤' });

@@ -393,11 +393,8 @@
     p.currentLatitude = arrival.latitude;
     p.currentLongitude = arrival.longitude;
     saveStore(store);
-    const [landingScenery, landingFood] = await Promise.all([
-      generateLocalScenery(arrival, active, landed),
-      generateLocalFood(arrival, active, landed),
-    ]);
-    return { flight: enrichFlight(landed), landingScenery, landingFood };
+    const landingScenery = await generateLocalScenery(arrival, active, landed);
+    return { flight: enrichFlight(landed), landingScenery, landingFood: null };
   }
 
   function handleBoard(groupId) {

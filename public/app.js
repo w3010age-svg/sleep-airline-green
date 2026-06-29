@@ -383,6 +383,36 @@ async function doTakeoff() {
   }
 }
 
+async function generateFoodAfterLanding(landed) {
+  if (!landed?.arrivalLocation) return null;
+  try {
+    const res = await fetch('/api/food/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        city: landed.arrivalLocation,
+        country: '',
+        displayName: landed.arrivalLocation,
+        flightId: landed.flightId || ('food-' + Date.now()),
+        passengerId: passenger?.passengerId || '',
+        passengerName: passenger?.name || '',
+        groupId: passenger?.groupId || '',
+        landingTime: landed.landingTime || new Date().toISOString(),
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => '');
+      console.warn('Food image generation failed:', msg);
+      return null;
+    }
+    const data = await res.json();
+    return data.landingFood || null;
+  } catch (err) {
+    console.warn('Food image generation failed:', err);
+    return null;
+  }
+}
+
 async function doLand() {
   clearMsg('main');
   $('btn-land').disabled = true;
@@ -409,6 +439,16 @@ async function doLand() {
       (landingFood?.imageUrl ? ' · 美食圖已生成' : ''));
     updateUI();
     await fetchBoard();
+    if (!landingFood?.imageUrl) {
+      renderFoodCard(true);
+      landingFood = await generateFoodAfterLanding(landed);
+      renderFoodCard(false);
+      if (landingFood?.imageUrl) {
+        showMsg('main', 'success', '✓ 當地美食圖已生成');
+      } else {
+        showMsg('main', 'error', '美食圖暫時沒有生成成功，請確認 Vercel 的 OPENAI_API_KEY / OPENAI_IMAGE_MODEL 後再試。');
+      }
+    }
     if (landed.captainBroadcast && window.BroadcastAudio) {
       BroadcastAudio.playCaptainBroadcast(
         landed.captainBroadcast,
