@@ -14,6 +14,8 @@ export function buildSceneryPrompt(city: string, country: string, displayName: s
     `gazing at the landscape near ${place}.`,
     `Outside the airplane window, include a small original caped flying hero silhouette in the distance,`,
     `not Superman, not a recognizable copyrighted character, no logos or chest symbols.`,
+    `The hero emits thin red glowing eye beams angled toward the airplane window,`,
+    `creating dramatic reflections on the glass without cracking or damaging it.`,
     `Dreamy and poetic mood: deep midnight navy sky, soft starlight,`,
     `gentle moonlit mist over terrain typical of ${country},`,
     `rolling hills, coastline, or valley silhouettes, not a tourist postcard or famous monument.`,
