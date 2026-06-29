@@ -236,11 +236,59 @@ body::before {
 
 /* ── Landing Scenery ───────────────────────────────────────────────────────── */
 .scenery-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   text-align: center;
-  padding: 32px 16px;
-  font-size: 13px;
+  padding: 34px 16px 30px;
   color: var(--sky);
-  font-style: italic;
+}
+.scenery-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid rgba(139, 184, 160, 0.18);
+  border-top-color: var(--sky);
+  border-right-color: var(--amber);
+  box-shadow: 0 0 24px rgba(74, 222, 128, 0.22);
+  animation: scenery-spin 0.9s linear infinite;
+}
+.scenery-loading-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+.scenery-loading-sub {
+  max-width: 280px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.scenery-loading-bar {
+  width: min(260px, 100%);
+  height: 6px;
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  background: rgba(7, 26, 18, 0.88);
+}
+.scenery-loading-bar span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--sky), var(--amber), transparent);
+  animation: scenery-sweep 1.35s ease-in-out infinite;
+}
+@keyframes scenery-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes scenery-sweep {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(260%); }
 }
 .scenery-wrap { margin-top: 4px; }
 .scenery-img {

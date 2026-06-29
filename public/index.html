@@ -182,7 +182,12 @@
           <!-- Landing Scenery -->
           <div class="card hidden" id="scenery-card">
             <div class="section-title">降落風景</div>
-            <div id="scenery-loading" class="scenery-loading hidden">AI 正在繪製當地風景…</div>
+            <div id="scenery-loading" class="scenery-loading hidden">
+              <div class="scenery-spinner" aria-hidden="true"></div>
+              <div class="scenery-loading-title">AI 正在生成降落風景</div>
+              <div class="scenery-loading-sub">請稍候，正在把窗外的城市變成一張圖片...</div>
+              <div class="scenery-loading-bar" aria-hidden="true"><span></span></div>
+            </div>
             <div id="scenery-wrap" class="scenery-wrap hidden">
               <img id="scenery-img" class="scenery-img" alt="降落風景">
               <div class="scenery-caption" id="scenery-caption"></div>
