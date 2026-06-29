@@ -366,7 +366,8 @@
       const res = await fetch('/api/config', { signal: ctrl.signal });
       clearTimeout(timer);
       if (res.ok) {
-        active = false;
+        const config = await res.json().catch(() => null);
+        active = config?.dataMode === 'preview' || config?.notionReady === false;
         return;
       }
     } catch { /* fall through */ }
