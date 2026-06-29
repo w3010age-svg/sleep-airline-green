@@ -1,0 +1,347 @@
+/* ── Variables ──────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #04130d;
+  --card: #0b2118;
+  --border: #1f5d42;
+  --text: #e8f7ef;
+  --muted: #8bb8a0;
+  --amber: #a7f3d0;
+  --sky: #4ade80;
+  --green: #22c55e;
+  --red: #f87171;
+  --input-bg: #071a12;
+}
+
+/* ── Reset & Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(34,197,94,0.16), transparent 30%),
+    radial-gradient(circle at 85% 8%, rgba(167,243,208,0.11), transparent 28%),
+    linear-gradient(180deg, #04130d 0%, #071a12 56%, #02100a 100%);
+  color: var(--text);
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Starfield */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(167,243,208,0.10) 1px, transparent 1px),
+    radial-gradient(circle, rgba(74,222,128,0.05) 1px, transparent 1px);
+  background-size: 80px 80px, 40px 40px;
+  background-position: 0 0, 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ────────────────────────────────────────────────────────────────── */
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+.col { display: flex; flex-direction: column; gap: 20px; }
+
+/* Center login */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.login-box { width: 100%; max-width: 400px; }
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+.header-brand { color: var(--sky); font-size: 18px; font-weight: 600; letter-spacing: 3px; }
+.header-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.brand-link { color: inherit; text-decoration: none; display: inline-block; }
+.brand-link:hover .header-brand { color: var(--amber); }
+.brand-link:hover .header-sub { color: var(--text); }
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+/* ── Card ──────────────────────────────────────────────────────────────────── */
+.card {
+  background: rgba(11, 33, 24, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ── Typography ────────────────────────────────────────────────────────────── */
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* ── Form ──────────────────────────────────────────────────────────────────── */
+.form-group { margin-bottom: 14px; }
+
+.input, .select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus, .select:focus { border-color: var(--sky); }
+.select { appearance: none; cursor: pointer; }
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary { background: linear-gradient(135deg, #047857, #16a34a); color: white; }
+.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #059669, #22c55e); }
+
+.btn-amber { background: linear-gradient(135deg, #166534, #15803d); color: white; }
+.btn-amber:hover:not(:disabled) { background: linear-gradient(135deg, #15803d, #22c55e); }
+
+.btn-green { background: linear-gradient(135deg, #065f46, #059669); color: white; }
+.btn-green:hover:not(:disabled) { background: linear-gradient(135deg, #059669, #10b981); }
+
+.btn-ghost {
+  width: auto;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  letter-spacing: 1px;
+}
+.btn-ghost:hover { border-color: var(--sky); color: var(--sky); }
+
+/* ── Status Badge ──────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+}
+.badge-flight { background: rgba(167,243,208,0.14); color: var(--amber); border: 1px solid rgba(167,243,208,0.32); }
+.badge-landed { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+.badge-idle   { background: rgba(107,140,173,0.15); color: var(--muted); border: 1px solid rgba(107,140,173,0.3); }
+
+/* ── Info Row ──────────────────────────────────────────────────────────────── */
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.info-label { font-size: 12px; color: var(--muted); }
+.info-value { font-size: 13px; }
+
+/* ── Departure Box ─────────────────────────────────────────────────────────── */
+.departure-box {
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.24);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.departure-label { font-size: 12px; color: var(--muted); }
+.departure-value { font-size: 16px; font-weight: 500; color: var(--amber); margin-top: 4px; }
+
+/* ── Progress Bar ──────────────────────────────────────────────────────────── */
+.progress-wrap { margin: 8px 0; }
+.progress-bar {
+  height: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #15803d, #4ade80);
+  transition: width 0.5s;
+}
+.progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* ── Messages ──────────────────────────────────────────────────────────────── */
+.msg { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+.msg-error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--red); }
+.msg-success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--green); }
+.msg.show { display: block; }
+
+/* ── Broadcast Box ─────────────────────────────────────────────────────────── */
+.broadcast-box {
+  background: rgba(74,222,128,0.07);
+  border: 1px solid rgba(74,222,128,0.22);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.8;
+  color: var(--sky);
+}
+.social-cue-box {
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 12px;
+}
+.flight-summary { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+/* ── Landing Scenery ───────────────────────────────────────────────────────── */
+.scenery-loading {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 13px;
+  color: var(--sky);
+  font-style: italic;
+}
+.scenery-wrap { margin-top: 4px; }
+.scenery-img {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: block;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: rgba(7, 26, 18, 0.8);
+}
+.scenery-caption {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.scenery-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--sky);
+  text-decoration: none;
+  word-break: break-all;
+}
+.scenery-link:hover { text-decoration: underline; }
+
+/* ── Divider ───────────────────────────────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ── Flight Board Table ────────────────────────────────────────────────────── */
+.board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+.board-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.board-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.board-table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(31,93,66,0.4);
+  vertical-align: middle;
+}
+.board-table tr:last-child td { border-bottom: none; }
+.board-table tr:hover td { background: rgba(74,222,128,0.04); }
+
+.board-empty { text-align: center; padding: 40px 0; font-size: 12px; color: var(--muted); }
+
+/* Board subsections */
+.board-sub { margin-top: 20px; }
+.board-sub-item {
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.board-cue-item {
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.15);
+  font-size: 12px;
+  color: var(--green);
+}
+.board-broadcast-item {
+  background: rgba(74,222,128,0.06);
+  border: 1px solid rgba(74,222,128,0.16);
+}
+.board-broadcast-meta { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.board-broadcast-text { font-size: 12px; color: var(--sky); font-style: italic; line-height: 1.7; }
+
+/* ── Setup Guide ───────────────────────────────────────────────────────────── */
+.setup-step { display: flex; gap: 12px; padding: 6px 0; }
+.setup-num { font-size: 16px; color: var(--sky); min-width: 20px; }
+.setup-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.setup-code {
+  display: inline;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--amber);
+  font-size: 11px;
+}
+
+/* ── Collapsible ───────────────────────────────────────────────────────────── */
+.collapsible { cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between; }
+.collapsible:hover { color: var(--sky); }
+.collapse-arrow { font-size: 12px; transition: transform 0.2s; }
+.collapse-arrow.collapsed { transform: rotate(-90deg); }
+.collapse-content-hidden { display: none; }
+
+/* ── Utility ───────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.text-sky { color: var(--sky); }
+.text-amber { color: var(--amber); }
+.text-green { color: var(--green); }
+.text-muted { color: var(--muted); }
+.text-bold { font-weight: 600; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.overflow-x { overflow-x: auto; }
