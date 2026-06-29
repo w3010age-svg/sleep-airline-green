@@ -12,12 +12,14 @@ export function buildSceneryPrompt(city: string, country: string, displayName: s
   return [
     `View through an airplane cabin window on a quiet night flight,`,
     `gazing at the landscape near ${place}.`,
+    `Outside the airplane window, include a small original caped flying hero silhouette in the distance,`,
+    `not Superman, not a recognizable copyrighted character, no logos or chest symbols.`,
     `Dreamy and poetic mood: deep midnight navy sky, soft starlight,`,
     `gentle moonlit mist over terrain typical of ${country},`,
     `rolling hills, coastline, or valley silhouettes, not a tourist postcard or famous monument.`,
     `Cinematic, half-awake memory feel; subtle amber reflection on the window glass,`,
     `cool blue-teal atmosphere like a long night journey before dawn.`,
-    `Soft atmospheric perspective, no people, no text, no watermark, no logos.`,
+    `Soft atmospheric perspective, no other people, no text, no watermark, no logos.`,
   ].join(' ');
 }
 
