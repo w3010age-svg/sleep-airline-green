@@ -243,6 +243,68 @@ body::before {
 }
 .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 5px; }
 
+.flight-sky-animation {
+  position: relative;
+  height: 86px;
+  margin: 18px 0 4px;
+  overflow: hidden;
+  border: 1px solid #d6ead0;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(239,249,234,0.88)),
+    radial-gradient(circle at 18% 25%, rgba(255,255,255,0.96), transparent 18%),
+    linear-gradient(135deg, #f8fff4, #dff3d5);
+}
+.flight-path-line {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 50%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(80, 160, 90, 0.32), transparent);
+}
+.flight-plane {
+  position: absolute;
+  left: 8%;
+  top: 38%;
+  font-size: 24px;
+  color: var(--leaf-deep);
+  filter: drop-shadow(0 7px 10px rgba(47, 157, 91, 0.18));
+  animation: plane-cruise 4.8s ease-in-out infinite;
+}
+.flight-cloud {
+  position: absolute;
+  width: 54px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  box-shadow: 18px 2px 0 rgba(255,255,255,0.68), 34px -4px 0 rgba(255,255,255,0.52);
+}
+.cloud-a { left: 12%; top: 20px; animation: cloud-drift 7s linear infinite; }
+.cloud-b { left: 62%; top: 52px; transform: scale(0.75); animation: cloud-drift 9s linear infinite reverse; }
+@keyframes plane-cruise {
+  0% { transform: translateX(0) translateY(5px) rotate(-6deg); opacity: 0.55; }
+  12% { opacity: 1; }
+  50% { transform: translateX(235px) translateY(-6px) rotate(3deg); }
+  88% { opacity: 1; }
+  100% { transform: translateX(470px) translateY(2px) rotate(-3deg); opacity: 0.55; }
+}
+@keyframes cloud-drift {
+  0% { transform: translateX(-40px); }
+  100% { transform: translateX(90px); }
+}
+@media (max-width: 640px) {
+  @keyframes plane-cruise {
+    0% { transform: translateX(0) translateY(5px) rotate(-6deg); opacity: 0.55; }
+    12% { opacity: 1; }
+    50% { transform: translateX(145px) translateY(-6px) rotate(3deg); }
+    88% { opacity: 1; }
+    100% { transform: translateX(285px) translateY(2px) rotate(-3deg); opacity: 0.55; }
+  }
+}
+
+
 .msg { padding: 12px 15px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
 .msg-error { background: #fff0f0; border: 1px solid #f0c4c4; color: var(--red); }
 .msg-success { background: #edf9e7; border: 1px solid #c8e6bb; color: #2f7d45; }

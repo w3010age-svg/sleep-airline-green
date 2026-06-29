@@ -17,7 +17,7 @@ import { findArrivalDestination } from './src/lib/flight/direction';
 import { resolveGroupSocialCue } from './src/lib/flight/social';
 import { generateCaptainBroadcast, fallbackCaptainBroadcast } from './src/lib/ai/broadcast';
 import { generateBroadcastSpeech } from './src/lib/ai/speech';
-import { generateLandingScenery } from './src/lib/ai/scenery';
+import { generateLandingScenery, generateLandingFood } from './src/lib/ai/scenery';
 import { saveLandingScenery, getLandscapeByFlightId } from './src/lib/notion/landscape-images';
 import { backfillSceneryForFlights } from './src/lib/notion/scenery-backfill';
 
@@ -80,6 +80,48 @@ app.post('/api/scenery/generate', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : '圖片生成失敗' });
+  }
+});
+
+// ── POST /api/food/generate ──────────────────────────────────────────────────
+
+app.post('/api/food/generate', async (req, res) => {
+  try {
+    const {
+      city = 'Green Harbor',
+      country = '',
+      displayName = city,
+      flightId = 'preview-' + Date.now(),
+      passengerId = '',
+      passengerName = '',
+      groupId = '',
+      landingTime = new Date().toISOString(),
+    } = req.body ?? {};
+
+    const foodGen = await generateLandingFood(city, country, displayName, flightId);
+    if (!foodGen) {
+      res.json({ landingFood: null });
+      return;
+    }
+
+    res.json({
+      landingFood: {
+        entryId: `FOOD-${flightId}`,
+        flightId,
+        passengerId,
+        passengerName,
+        groupId,
+        arrivalLocation: displayName,
+        country,
+        imageUrl: `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
+        imagePrompt: foodGen.imagePrompt,
+        recommendation: `抵達 ${displayName} 後，推薦試試當地特色料理。`,
+        landingTime,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : '美食圖片生成失敗' });
   }
 });
 
@@ -230,6 +272,33 @@ app.post('/api/flight/takeoff', async (req, res) => {
       relatedPassenger: socialCue.relatedPassenger ?? '',
     });
 
+    try {
+      const foodGen = await generateLandingFood(
+        arrival.city,
+        arrival.country,
+        arrival.displayName,
+        activeFlight.flightId
+      );
+      if (foodGen) {
+        landingFood = {
+          entryId: `FOOD-${activeFlight.flightId}`,
+          flightId: activeFlight.flightId,
+          passengerId: passenger.passengerId,
+          passengerName: passenger.name,
+          groupId: passenger.groupId,
+          arrivalLocation: arrival.displayName,
+          country: arrival.country,
+          imageUrl: `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
+          imagePrompt: foodGen.imagePrompt,
+          recommendation: `抵達 ${arrival.displayName} 後，推薦試試當地特色料理。`,
+          landingTime,
+          createdAt: new Date().toISOString(),
+        };
+      }
+    } catch (foodErr) {
+      console.error('Landing food generation failed:', foodErr);
+    }
+
     res.json({
       flight: {
         ...flight,
@@ -354,6 +423,7 @@ app.post('/api/flight/land', async (req, res) => {
     });
 
     let landingScenery = null;
+    let landingFood = null;
     try {
       const sceneryGen = await generateLandingScenery(
         arrival.city,
@@ -398,6 +468,7 @@ app.post('/api/flight/land', async (req, res) => {
         relatedPassenger: socialCue.relatedPassenger,
       },
       landingScenery,
+      landingFood,
     });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : '未知錯誤' });

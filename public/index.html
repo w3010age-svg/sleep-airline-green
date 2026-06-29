@@ -150,6 +150,12 @@
               <div class="progress-bar"><div class="progress-fill" id="fl-progress-bar" style="width:0%"></div></div>
               <div class="progress-labels"><span>起飛</span><span>抵達</span></div>
             </div>
+            <div class="flight-sky-animation" aria-hidden="true">
+              <div class="flight-cloud cloud-a"></div>
+              <div class="flight-cloud cloud-b"></div>
+              <div class="flight-path-line"></div>
+              <div class="flight-plane">✈</div>
+            </div>
             <hr class="divider">
             <div class="section-title" style="font-size:13px;margin-bottom:8px">起飛廣播</div>
             <div class="broadcast-box hidden" id="fl-takeoff-broadcast"></div>
@@ -179,6 +185,20 @@
               <img id="scenery-img" class="scenery-img" alt="降落風景">
               <div class="scenery-caption" id="scenery-caption"></div>
               <a id="scenery-link" class="scenery-link" href="#" target="_blank" rel="noopener">查看圖片 URL</a>
+            </div>
+          </div>
+          <div class="card hidden" id="food-card">
+            <div class="section-title">當地美食推薦</div>
+            <div id="food-loading" class="scenery-loading hidden">
+              <div class="scenery-spinner" aria-hidden="true"></div>
+              <div class="scenery-loading-title">AI 正在推薦當地美食</div>
+              <div class="scenery-loading-sub">正在為抵達城市準備一張可以吃的風景...</div>
+              <div class="scenery-loading-bar" aria-hidden="true"><span></span></div>
+            </div>
+            <div id="food-wrap" class="scenery-wrap hidden">
+              <img id="food-img" class="scenery-img" alt="當地美食推薦">
+              <div class="scenery-caption" id="food-caption"></div>
+              <a id="food-link" class="scenery-link" href="#" target="_blank" rel="noopener">查看圖片 URL</a>
             </div>
           </div>
         </div>

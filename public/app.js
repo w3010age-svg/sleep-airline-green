@@ -30,6 +30,7 @@ let activeFlight = null;
 let groupFlights = [];
 let lastLandedFlight = null;
 let landingScenery = null;
+let landingFood = null;
 let refreshTimer = null;
 
 // ── DOM Refs ──────────────────────────────────────────────────────────────────
@@ -195,6 +196,7 @@ function updateUI() {
   }
 
   renderSceneryCard();
+  renderFoodCard();
 
   // Board
   $('bd-group').textContent = passenger.groupId;
@@ -217,6 +219,24 @@ function renderSceneryCard(loading = false) {
     (landingScenery.country ? ' · ' + landingScenery.country : '');
   $('scenery-link').href = landingScenery.imageUrl;
   $('scenery-link').textContent = landingScenery.imageUrl;
+}
+
+function renderFoodCard(loading = false) {
+  const hasFood = landingFood?.imageUrl;
+  const showCard = loading || hasFood;
+
+  $('food-card').classList.toggle('hidden', !showCard);
+  $('food-loading').classList.toggle('hidden', !loading);
+  $('food-wrap').classList.toggle('hidden', loading || !hasFood);
+
+  if (!hasFood) return;
+
+  $('food-img').src = landingFood.imageUrl;
+  $('food-img').alt = landingFood.recommendation || '當地美食推薦';
+  $('food-caption').textContent = (landingFood.recommendation || '推薦試試當地特色料理。') +
+    (landingFood.arrivalLocation ? ' · ' + landingFood.arrivalLocation : '');
+  $('food-link').href = landingFood.imageUrl;
+  $('food-link').textContent = landingFood.imageUrl;
 }
 
 // ── Board Rendering ───────────────────────────────────────────────────────────
@@ -338,6 +358,8 @@ async function doTakeoff() {
       routeDirection: $('tk-direction').value,
     });
     activeFlight = data.flight;
+    landingScenery = null;
+    landingFood = null;
     passenger.status = 'in_flight';
     lastLandedFlight = null;
     landingScenery = null;
@@ -365,7 +387,10 @@ async function doLand() {
   clearMsg('main');
   $('btn-land').disabled = true;
   $('btn-land').textContent = '降落中，請稍候...';
+  landingScenery = null;
+  landingFood = null;
   renderSceneryCard(true);
+  renderFoodCard(true);
   try {
     const data = await api('POST', '/api/flight/land', {
       passengerId: passenger.passengerId,
@@ -375,11 +400,13 @@ async function doLand() {
     const landed = data.flight;
     lastLandedFlight = landed;
     landingScenery = data.landingScenery || null;
+    landingFood = data.landingFood || null;
     activeFlight = null;
     passenger.status = 'landed';
     passenger.currentLocation = landed.arrivalLocation || passenger.currentLocation;
     showMsg('main', 'success', '✓ 已降落於 ' + landed.arrivalLocation +
-      (landingScenery?.imageUrl ? ' · 風景圖已生成' : ''));
+      (landingScenery?.imageUrl ? ' · 風景圖已生成' : '') +
+      (landingFood?.imageUrl ? ' · 美食圖已生成' : ''));
     updateUI();
     await fetchBoard();
     if (landed.captainBroadcast && window.BroadcastAudio) {
@@ -390,7 +417,9 @@ async function doLand() {
     }
   } catch (err) {
     landingScenery = null;
+    landingFood = null;
     renderSceneryCard(false);
+    renderFoodCard(false);
     showMsg('main', 'error', err.message);
   } finally {
     $('btn-land').disabled = false;
@@ -404,6 +433,7 @@ function doLogout() {
   groupFlights = [];
   lastLandedFlight = null;
   landingScenery = null;
+  landingFood = null;
   stopAutoRefresh();
   clearMsg('main');
   updateUI();

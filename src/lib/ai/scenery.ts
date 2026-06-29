@@ -24,6 +24,73 @@ export function buildSceneryPrompt(city: string, country: string, displayName: s
     `Soft atmospheric perspective, no other people, no text, no watermark, no logos.`,
   ].join(' ');
 }
+export function buildFoodPrompt(city: string, country: string, displayName: string): string {
+  const place = displayName || `${city}, ${country}`;
+  return [
+    `A delicious local food recommendation for a traveler who has just landed near ${place}.`,
+    `Show one inviting signature dish or snack that feels authentic to ${country},`,
+    `served beautifully on a clean ceramic plate or small tray with fresh green accents.`,
+    `Bright airy natural daylight, fresh white and pale green styling, editorial food photography.`,
+    `No brand logos, no packaging, no text, no watermark, no people, no menus.`,
+  ].join(' ');
+}
+
+export async function generateLandingFood(
+  city: string,
+  country: string,
+  displayName: string,
+  flightId: string
+): Promise<SceneryGenerationResult | null> {
+  if (!process.env.OPENAI_API_KEY) return null;
+
+  const imagePrompt = buildFoodPrompt(city, country, displayName);
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const model = process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini';
+
+  const response = await client.images.generate(
+    isGptImageModel(model)
+      ? {
+          model,
+          prompt: imagePrompt,
+          size: SCENERY_IMAGE_SIZE,
+          quality: 'medium',
+          output_format: 'png',
+          n: 1,
+        }
+      : {
+          model,
+          prompt: imagePrompt,
+          size: SCENERY_IMAGE_SIZE,
+          quality: 'standard',
+          n: 1,
+        }
+  );
+
+  const b64 = response.data[0]?.b64_json;
+  if (b64) {
+    return {
+      imageBuffer: Buffer.from(b64, 'base64'),
+      imagePrompt,
+      contentType: 'image/png',
+      filename: `food-${safeFilename(city, flightId)}`,
+    };
+  }
+
+  const imageUrl = response.data[0]?.url;
+  if (!imageUrl) return null;
+
+  const imageRes = await fetch(imageUrl);
+  if (!imageRes.ok) return null;
+  const imageBuffer = Buffer.from(await imageRes.arrayBuffer());
+
+  return {
+    imageBuffer,
+    imagePrompt,
+    contentType: imageRes.headers.get('content-type') ?? 'image/png',
+    filename: `food-${safeFilename(city, flightId)}`,
+  };
+}
+
 
 /** Landscape aspect ratio suits the night-window composition. */
 export const SCENERY_IMAGE_SIZE = '1536x1024';
