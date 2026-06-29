@@ -10,15 +10,16 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function tone(freq, startSec, durSec, volume = 0.12) {
+function tone(freq, startSec, durSec, volume = 0.12, type = 'sine') {
   const ctx = getAudioCtx();
   if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = 'sine';
+  osc.type = type;
   osc.frequency.value = freq;
   const t0 = ctx.currentTime + startSec;
-  gain.gain.setValueAtTime(volume, t0);
+  gain.gain.setValueAtTime(0.001, t0);
+  gain.gain.linearRampToValueAtTime(volume, t0 + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.001, t0 + durSec);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -39,18 +40,20 @@ function stopPlayback() {
 }
 
 async function playAttentionBeeps() {
-  tone(520, 0, 0.08, 0.09);
-  await delay(200);
-  tone(520, 0, 0.08, 0.09);
-  await delay(200);
-  tone(520, 0, 0.08, 0.09);
-  await delay(280);
+  // Original retro game-style boarding cue. Short square-wave notes evoke 8-bit games
+  // without copying any recognizable melody.
+  const notes = [659, 784, 988, 1319];
+  notes.forEach((freq, i) => tone(freq, i * 0.075, 0.07, 0.075, 'square'));
+  tone(1976, 0.34, 0.09, 0.055, 'triangle');
+  await delay(500);
 }
 
 async function playPaChime() {
-  tone(880, 0, 0.2, 0.13);
-  tone(660, 0.24, 0.32, 0.13);
-  await delay(620);
+  const notes = [1047, 1319, 1568, 2093, 1568, 2093];
+  notes.forEach((freq, i) => tone(freq, i * 0.085, 0.08, i === 3 ? 0.08 : 0.06, 'square'));
+  tone(523, 0, 0.48, 0.025, 'triangle');
+  tone(1047, 0.18, 0.34, 0.035, 'triangle');
+  await delay(720);
 }
 
 function pickZhVoice() {
