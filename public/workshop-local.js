@@ -292,6 +292,32 @@
     return { flight: enrichFlight(flight) };
   }
 
+
+  async function generateLocalScenery(arrival, active, landed) {
+    if (window.location.protocol === 'file:') return null;
+    try {
+      const res = await fetch('/api/scenery/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          city: arrival.city,
+          country: arrival.country,
+          displayName: arrival.displayName,
+          flightId: active.flightId,
+          passengerId: active.passengerId,
+          passengerName: active.passengerName,
+          groupId: active.groupId,
+          landingTime: landed.landingTime,
+        }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.landingScenery || null;
+    } catch {
+      return null;
+    }
+  }
+
   async function handleLand(body) {
     const cities = await loadCities();
     const store = loadStore();
@@ -341,7 +367,8 @@
     p.currentLatitude = arrival.latitude;
     p.currentLongitude = arrival.longitude;
     saveStore(store);
-    return { flight: enrichFlight(landed), landingScenery: null };
+    const landingScenery = await generateLocalScenery(arrival, active, landed);
+    return { flight: enrichFlight(landed), landingScenery };
   }
 
   function handleBoard(groupId) {

@@ -13,7 +13,7 @@ export function buildSceneryPrompt(city: string, country: string, displayName: s
     `View through an airplane cabin window on a quiet night flight,`,
     `gazing at the landscape near ${place}.`,
     `Dreamy and poetic mood: deep midnight navy sky, soft starlight,`,
-    `gentle moonlit mist over terrain typical of ${country} —`,
+    `gentle moonlit mist over terrain typical of ${country},`,
     `rolling hills, coastline, or valley silhouettes, not a tourist postcard or famous monument.`,
     `Cinematic, half-awake memory feel; subtle amber reflection on the window glass,`,
     `cool blue-teal atmosphere like a long night journey before dawn.`,

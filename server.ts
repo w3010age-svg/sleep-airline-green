@@ -40,6 +40,49 @@ app.get('/api/config', async (_req, res) => {
   }
 });
 
+
+// ── POST /api/scenery/generate ────────────────────────────────────────────────
+
+app.post('/api/scenery/generate', async (req, res) => {
+  try {
+    const {
+      city = 'Green Harbor',
+      country = '',
+      displayName = city,
+      flightId = `preview-${Date.now()}`,
+      passengerId = '',
+      passengerName = '',
+      groupId = '',
+      landingTime = new Date().toISOString(),
+    } = req.body ?? {};
+
+    const sceneryGen = await generateLandingScenery(city, country, displayName, flightId);
+    if (!sceneryGen) {
+      res.json({ landingScenery: null });
+      return;
+    }
+
+    res.json({
+      landingScenery: {
+        notionId: `preview_scenery_${flightId}`,
+        entryId: `SC-${flightId}`,
+        flightId,
+        passengerId,
+        passengerName,
+        groupId,
+        arrivalLocation: displayName,
+        country,
+        imageUrl: `data:${sceneryGen.contentType};base64,${sceneryGen.imageBuffer.toString('base64')}`,
+        imagePrompt: sceneryGen.imagePrompt,
+        landingTime,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : '圖片生成失敗' });
+  }
+});
+
 // ── GET /api/notion/schema ────────────────────────────────────────────────────
 
 /** 讀取主辦 Notion 總表目前實際欄位（對照刪欄後的現況）。 */
