@@ -245,21 +245,33 @@ body::before {
 
 .flight-sky-animation {
   position: relative;
-  height: 86px;
+  height: 112px;
   margin: 18px 0 4px;
   overflow: hidden;
   border: 1px solid #d6ead0;
   border-radius: 8px;
   background:
+    radial-gradient(circle at 78% 22%, rgba(255, 244, 178, 0.72) 0 9%, transparent 18%),
     linear-gradient(180deg, rgba(255,255,255,0.78), rgba(239,249,234,0.88)),
     radial-gradient(circle at 18% 25%, rgba(255,255,255,0.96), transparent 18%),
     linear-gradient(135deg, #f8fff4, #dff3d5);
+  perspective: 460px;
+}
+.flight-sky-animation::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -24px;
+  height: 58px;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, rgba(177, 218, 136, 0.34), rgba(118, 178, 100, 0.16));
 }
 .flight-path-line {
   position: absolute;
   left: 9%;
   right: 9%;
-  top: 50%;
+  top: 54%;
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(90deg, transparent, rgba(80, 160, 90, 0.32), transparent);
@@ -267,11 +279,75 @@ body::before {
 .flight-plane {
   position: absolute;
   left: 8%;
-  top: 38%;
-  font-size: 24px;
-  color: var(--leaf-deep);
-  filter: drop-shadow(0 7px 10px rgba(47, 157, 91, 0.18));
-  animation: plane-cruise 4.8s ease-in-out infinite;
+  top: 42%;
+  width: 76px;
+  height: 34px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 16px 16px rgba(47, 157, 91, 0.24));
+  animation: plane-cruise 5.2s ease-in-out infinite;
+  z-index: 2;
+}
+.plane-body,
+.landing-plane-body {
+  position: absolute;
+  left: 9px;
+  top: 13px;
+  width: 56px;
+  height: 12px;
+  border-radius: 999px 18px 18px 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #dcefd6 48%, #72b865 100%);
+  border: 1px solid rgba(64, 128, 75, 0.22);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.82), inset 0 -3px 5px rgba(47, 119, 67, 0.18);
+}
+.plane-body::after,
+.landing-plane-body::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: 3px;
+  width: 14px;
+  height: 7px;
+  border-radius: 50%;
+  background: #eff9e9;
+  border-right: 2px solid #4eaf67;
+}
+.plane-window,
+.landing-plane-window {
+  position: absolute;
+  left: 43px;
+  top: 15px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b9dfec;
+  box-shadow: -10px 0 0 #b9dfec, -20px 0 0 #b9dfec;
+}
+.plane-tail,
+.landing-plane-tail {
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 19px;
+  height: 18px;
+  clip-path: polygon(0 100%, 100% 67%, 28% 0);
+  background: linear-gradient(135deg, #8bc36f, #3e8d53);
+}
+.plane-wing {
+  position: absolute;
+  left: 26px;
+  top: 16px;
+  width: 31px;
+  height: 22px;
+  border-radius: 7px 18px 7px 18px;
+  background: linear-gradient(135deg, #ffffff, #78bd68);
+  transform: skewX(-22deg) rotateX(48deg);
+  transform-origin: left top;
+}
+.wing-shadow {
+  top: 5px;
+  opacity: 0.72;
+  transform: skewX(20deg) rotateX(-56deg) scaleY(0.72);
+  background: linear-gradient(135deg, #d6edcd, #579d5c);
 }
 .flight-cloud {
   position: absolute;
@@ -284,11 +360,11 @@ body::before {
 .cloud-a { left: 12%; top: 20px; animation: cloud-drift 7s linear infinite; }
 .cloud-b { left: 62%; top: 52px; transform: scale(0.75); animation: cloud-drift 9s linear infinite reverse; }
 @keyframes plane-cruise {
-  0% { transform: translateX(0) translateY(5px) rotate(-6deg); opacity: 0.55; }
+  0% { transform: translateX(-18px) translateY(11px) rotateZ(-8deg) rotateY(-18deg) scale(0.82); opacity: 0.55; }
   12% { opacity: 1; }
-  50% { transform: translateX(235px) translateY(-6px) rotate(3deg); }
+  50% { transform: translateX(240px) translateY(-12px) rotateZ(3deg) rotateY(14deg) scale(1.06); }
   88% { opacity: 1; }
-  100% { transform: translateX(470px) translateY(2px) rotate(-3deg); opacity: 0.55; }
+  100% { transform: translateX(500px) translateY(4px) rotateZ(-3deg) rotateY(22deg) scale(0.9); opacity: 0.55; }
 }
 @keyframes cloud-drift {
   0% { transform: translateX(-40px); }
@@ -296,11 +372,130 @@ body::before {
 }
 @media (max-width: 640px) {
   @keyframes plane-cruise {
-    0% { transform: translateX(0) translateY(5px) rotate(-6deg); opacity: 0.55; }
+    0% { transform: translateX(-18px) translateY(11px) rotateZ(-8deg) rotateY(-18deg) scale(0.78); opacity: 0.55; }
     12% { opacity: 1; }
-    50% { transform: translateX(145px) translateY(-6px) rotate(3deg); }
+    50% { transform: translateX(150px) translateY(-12px) rotateZ(3deg) rotateY(14deg) scale(1); }
     88% { opacity: 1; }
-    100% { transform: translateX(285px) translateY(2px) rotate(-3deg); opacity: 0.55; }
+    100% { transform: translateX(315px) translateY(4px) rotateZ(-3deg) rotateY(22deg) scale(0.84); opacity: 0.55; }
+  }
+}
+
+.landing-animation {
+  margin-bottom: 16px;
+  border: 1px solid #d6ead0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.74);
+  box-shadow: 0 14px 32px rgba(64, 128, 75, 0.12);
+}
+.landing-sky {
+  position: relative;
+  height: 128px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #fafff7 0%, #e6f4dc 66%, #d3e8c5 100%);
+  perspective: 520px;
+}
+.landing-sun {
+  position: absolute;
+  right: 28px;
+  top: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f4d674;
+  box-shadow: 0 0 34px rgba(244, 214, 116, 0.55);
+}
+.landing-runway {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -24px;
+  height: 68px;
+  transform: rotateX(64deg);
+  transform-origin: bottom center;
+  border-radius: 20px 20px 0 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 26px, rgba(255,255,255,0.8) 26px 38px, transparent 38px 64px),
+    linear-gradient(180deg, #8cb581, #5e8f65);
+  box-shadow: 0 -10px 18px rgba(88, 136, 82, 0.20);
+}
+.landing-plane {
+  position: absolute;
+  left: 4%;
+  top: 10px;
+  width: 84px;
+  height: 42px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 18px 14px rgba(47, 119, 67, 0.22));
+  animation: landing-approach 2.8s cubic-bezier(.28,.78,.26,1) forwards;
+}
+.landing-plane .landing-plane-body {
+  left: 10px;
+  top: 16px;
+  width: 62px;
+  height: 13px;
+}
+.landing-plane-wing {
+  position: absolute;
+  left: 30px;
+  top: 18px;
+  width: 34px;
+  height: 24px;
+  border-radius: 7px 18px 7px 18px;
+  background: linear-gradient(135deg, #ffffff, #78bd68);
+  transform: skewX(-22deg) rotateX(48deg);
+}
+.landing-plane .landing-plane-tail {
+  left: 4px;
+  top: 9px;
+}
+.landing-plane .landing-plane-window {
+  left: 49px;
+  top: 18px;
+}
+.landing-shadow {
+  position: absolute;
+  left: 15%;
+  bottom: 15px;
+  width: 40px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(47, 119, 67, 0.20);
+  filter: blur(3px);
+  animation: landing-shadow 2.8s cubic-bezier(.28,.78,.26,1) forwards;
+}
+.landing-text {
+  padding: 9px 12px 11px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 720;
+  color: var(--green);
+}
+.landing-complete .landing-plane,
+.landing-complete .landing-shadow {
+  animation-play-state: paused;
+}
+@keyframes landing-approach {
+  0% { transform: translateX(0) translateY(0) rotateZ(-9deg) rotateY(-18deg) scale(0.72); opacity: 0.62; }
+  74% { transform: translateX(265px) translateY(52px) rotateZ(2deg) rotateY(8deg) scale(1.02); opacity: 1; }
+  100% { transform: translateX(310px) translateY(64px) rotateZ(0deg) rotateY(0deg) scale(0.92); opacity: 1; }
+}
+@keyframes landing-shadow {
+  0% { transform: translateX(0) scale(0.55); opacity: 0.08; }
+  74% { transform: translateX(270px) scale(1.12); opacity: 0.22; }
+  100% { transform: translateX(318px) scale(1.32); opacity: 0.26; }
+}
+@media (max-width: 640px) {
+  @keyframes landing-approach {
+    0% { transform: translateX(0) translateY(0) rotateZ(-9deg) rotateY(-18deg) scale(0.7); opacity: 0.62; }
+    74% { transform: translateX(160px) translateY(54px) rotateZ(2deg) rotateY(8deg) scale(0.96); opacity: 1; }
+    100% { transform: translateX(190px) translateY(64px) rotateZ(0deg) rotateY(0deg) scale(0.88); opacity: 1; }
+  }
+  @keyframes landing-shadow {
+    0% { transform: translateX(0) scale(0.55); opacity: 0.08; }
+    74% { transform: translateX(165px) scale(1.04); opacity: 0.22; }
+    100% { transform: translateX(198px) scale(1.24); opacity: 0.26; }
   }
 }
 
@@ -382,6 +577,13 @@ body::before {
   background: #edf7e8;
 }
 .scenery-caption { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.food-fallback .scenery-caption {
+  color: #517148;
+  background: #f2faed;
+  border: 1px solid #d7ead0;
+  border-radius: 8px;
+  padding: 9px 10px;
+}
 .scenery-link { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--green); text-decoration: none; word-break: break-all; }
 .scenery-link:hover { text-decoration: underline; }
 

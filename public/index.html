@@ -154,13 +154,34 @@
               <div class="flight-cloud cloud-a"></div>
               <div class="flight-cloud cloud-b"></div>
               <div class="flight-path-line"></div>
-              <div class="flight-plane">✈</div>
+              <div class="flight-plane">
+                <span class="plane-wing wing-main"></span>
+                <span class="plane-body"></span>
+                <span class="plane-window"></span>
+                <span class="plane-tail"></span>
+                <span class="plane-wing wing-shadow"></span>
+              </div>
             </div>
             <hr class="divider">
             <div class="section-title" style="font-size:13px;margin-bottom:8px">起飛廣播</div>
             <div class="broadcast-box hidden" id="fl-takeoff-broadcast"></div>
             <hr class="divider">
             <button class="btn btn-green" id="btn-land">降落</button>
+          </div>
+
+          <div class="landing-animation hidden" id="landing-animation" aria-hidden="true">
+            <div class="landing-sky">
+              <div class="landing-sun"></div>
+              <div class="landing-runway"></div>
+              <div class="landing-plane">
+                <span class="landing-plane-wing"></span>
+                <span class="landing-plane-body"></span>
+                <span class="landing-plane-window"></span>
+                <span class="landing-plane-tail"></span>
+              </div>
+              <div class="landing-shadow"></div>
+            </div>
+            <div class="landing-text">正在緩緩降落...</div>
           </div>
 
           <div class="card hidden" id="broadcast-card">

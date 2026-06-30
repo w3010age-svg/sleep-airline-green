@@ -228,6 +228,7 @@ function renderFoodCard(loading = false) {
   $('food-card').classList.toggle('hidden', !showCard);
   $('food-loading').classList.toggle('hidden', !loading);
   $('food-wrap').classList.toggle('hidden', loading || !hasFood);
+  $('food-card').classList.toggle('food-fallback', !!landingFood?.isFallback);
 
   if (!hasFood) return;
 
@@ -237,6 +238,15 @@ function renderFoodCard(loading = false) {
     (landingFood.arrivalLocation ? ' · ' + landingFood.arrivalLocation : '');
   $('food-link').href = landingFood.imageUrl;
   $('food-link').textContent = landingFood.imageUrl;
+}
+
+function setLandingAnimation(active, complete = false) {
+  const el = $('landing-animation');
+  if (!el) return;
+  el.classList.toggle('hidden', !active);
+  el.classList.toggle('landing-complete', !!complete);
+  const text = el.querySelector('.landing-text');
+  if (text) text.textContent = complete ? '已平穩降落' : '正在緩緩降落...';
 }
 
 // ── Board Rendering ───────────────────────────────────────────────────────────
@@ -419,6 +429,7 @@ async function doLand() {
   $('btn-land').textContent = '降落中，請稍候...';
   landingScenery = null;
   landingFood = null;
+  setLandingAnimation(true, false);
   renderSceneryCard(true);
   renderFoodCard(true);
   try {
@@ -434,6 +445,7 @@ async function doLand() {
     activeFlight = null;
     passenger.status = 'landed';
     passenger.currentLocation = landed.arrivalLocation || passenger.currentLocation;
+    setLandingAnimation(true, true);
     showMsg('main', 'success', '✓ 已降落於 ' + landed.arrivalLocation +
       (landingScenery?.imageUrl ? ' · 風景圖已生成' : '') +
       (landingFood?.imageUrl ? ' · 美食圖已生成' : ''));
@@ -444,7 +456,9 @@ async function doLand() {
       landingFood = await generateFoodAfterLanding(landed);
       renderFoodCard(false);
       if (landingFood?.imageUrl) {
-        showMsg('main', 'success', '✓ 當地美食圖已生成');
+        showMsg('main', 'success', landingFood.isFallback
+          ? '✓ 已先放上美食推薦卡，AI 圖片可稍後再試'
+          : '✓ 當地美食圖已生成');
       } else {
         showMsg('main', 'error', '美食圖暫時沒有生成成功，請確認 Vercel 的 OPENAI_API_KEY / OPENAI_IMAGE_MODEL 後再試。');
       }
@@ -458,12 +472,14 @@ async function doLand() {
   } catch (err) {
     landingScenery = null;
     landingFood = null;
+    setLandingAnimation(false);
     renderSceneryCard(false);
     renderFoodCard(false);
     showMsg('main', 'error', err.message);
   } finally {
     $('btn-land').disabled = false;
     $('btn-land').textContent = '⬇  降落';
+    setTimeout(() => setLandingAnimation(false), 3600);
   }
 }
 

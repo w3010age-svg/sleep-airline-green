@@ -17,7 +17,7 @@ import { findArrivalDestination } from './src/lib/flight/direction';
 import { resolveGroupSocialCue } from './src/lib/flight/social';
 import { generateCaptainBroadcast, fallbackCaptainBroadcast } from './src/lib/ai/broadcast';
 import { generateBroadcastSpeech } from './src/lib/ai/speech';
-import { generateLandingScenery, generateLandingFood } from './src/lib/ai/scenery';
+import { generateLandingScenery, generateLandingFood, createLandingFoodFallback } from './src/lib/ai/scenery';
 import { saveLandingScenery, getLandscapeByFlightId } from './src/lib/notion/landscape-images';
 import { backfillSceneryForFlights } from './src/lib/notion/scenery-backfill';
 
@@ -98,11 +98,15 @@ app.post('/api/food/generate', async (req, res) => {
       landingTime = new Date().toISOString(),
     } = req.body ?? {};
 
-    const foodGen = await generateLandingFood(city, country, displayName, flightId);
-    if (!foodGen) {
-      res.json({ landingFood: null });
-      return;
+    let foodGen: Awaited<ReturnType<typeof generateLandingFood>> = null;
+    let imageError = '';
+    try {
+      foodGen = await generateLandingFood(city, country, displayName, flightId);
+    } catch (err) {
+      imageError = err instanceof Error ? err.message : 'food image generation failed';
+      console.error('Landing food generation failed:', err);
     }
+    foodGen ??= createLandingFoodFallback(city, country, displayName, flightId);
 
     res.json({
       landingFood: {
@@ -115,7 +119,11 @@ app.post('/api/food/generate', async (req, res) => {
         country,
         imageUrl: `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
         imagePrompt: foodGen.imagePrompt,
-        recommendation: `抵達 ${displayName} 後，推薦試試當地特色料理。`,
+        recommendation: foodGen.isFallback
+          ? `抵達 ${displayName} 後，先推薦試試當地特色料理。AI 美食圖暫時沒成功，已先放上推薦卡。`
+          : `抵達 ${displayName} 後，推薦試試當地特色料理。`,
+        isFallback: !!foodGen.isFallback,
+        warning: imageError || undefined,
         landingTime,
         createdAt: new Date().toISOString(),
       },
