@@ -342,6 +342,7 @@ async function doLogin(e) {
     passenger = data.passenger;
     lastLandedFlight = data.lastLandedFlight || null;
     landingScenery = data.landingScenery || null;
+    landingFood = data.landingFood || null;
     saveLoginProfile({ passengerId, name, groupId });
     showMsg('login', 'success', data.created ? '乘客建立成功！' : '已找到您的乘客資料。');
     await fetchBoard();

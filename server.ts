@@ -19,6 +19,7 @@ import { generateCaptainBroadcast, fallbackCaptainBroadcast } from './src/lib/ai
 import { generateBroadcastSpeech } from './src/lib/ai/speech';
 import { generateLandingScenery, generateLandingFood, createLandingFoodFallback } from './src/lib/ai/scenery';
 import { saveLandingScenery, getLandscapeByFlightId } from './src/lib/notion/landscape-images';
+import { saveLandingFoodImage, getLandingFoodByFlightId } from './src/lib/notion/food-images';
 import { backfillSceneryForFlights } from './src/lib/notion/scenery-backfill';
 
 import type { RouteDirection, BroadcastStyle, NarrativeRegion } from './src/types';
@@ -108,8 +109,28 @@ app.post('/api/food/generate', async (req, res) => {
     }
     foodGen ??= createLandingFoodFallback(city, country, displayName, flightId);
 
+    let savedFood = null;
+    try {
+      savedFood = await saveLandingFoodImage({
+        flightId,
+        passengerId,
+        passengerName,
+        groupId,
+        arrivalLocation: displayName,
+        country,
+        imageBuffer: foodGen.imageBuffer,
+        filename: foodGen.filename,
+        contentType: foodGen.contentType,
+        imagePrompt: foodGen.imagePrompt,
+        landingTime,
+      });
+    } catch (saveErr) {
+      console.error('Landing food image save failed:', saveErr);
+    }
+
     res.json({
       landingFood: {
+        ...(savedFood ?? {}),
         entryId: `FOOD-${flightId}`,
         flightId,
         passengerId,
@@ -117,7 +138,7 @@ app.post('/api/food/generate', async (req, res) => {
         groupId,
         arrivalLocation: displayName,
         country,
-        imageUrl: `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
+        imageUrl: savedFood?.imageUrl || `data:${foodGen.contentType};base64,${foodGen.imageBuffer.toString('base64')}`,
         imagePrompt: foodGen.imagePrompt,
         recommendation: foodGen.isFallback
           ? `抵達 ${displayName} 後，先推薦試試當地特色料理。AI 美食圖暫時沒成功，已先放上推薦卡。`
@@ -173,7 +194,10 @@ app.post('/api/passenger', async (req, res) => {
     const landingScenery = lastLandedFlight?.flightId
       ? await getLandscapeByFlightId(lastLandedFlight.flightId)
       : null;
-    res.json({ ...result, lastLandedFlight, landingScenery });
+    const landingFood = lastLandedFlight?.flightId
+      ? await getLandingFoodByFlightId(lastLandedFlight.flightId)
+      : null;
+    res.json({ ...result, lastLandedFlight, landingScenery, landingFood });
   } catch (err) {
     const message = formatNotionError(err);
     res.status(500).json({ error: message, message });
