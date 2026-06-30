@@ -11,18 +11,15 @@ export interface SceneryGenerationResult {
 export function buildSceneryPrompt(city: string, country: string, displayName: string): string {
   const place = displayName || `${city}, ${country}`;
   return [
-    `View through an airplane cabin window on a quiet night flight,`,
-    `gazing at the landscape near ${place}.`,
-    `Outside the airplane window, include a small original caped flying hero silhouette in the distance,`,
-    `not Superman, not a recognizable copyrighted character, no logos or chest symbols.`,
-    `The hero emits thin red glowing eye beams angled toward the airplane window,`,
-    `creating dramatic reflections on the glass without cracking or damaging it.`,
-    `Dreamy and poetic mood: deep midnight navy sky, soft starlight,`,
-    `gentle moonlit mist over terrain typical of ${country},`,
-    `rolling hills, coastline, or valley silhouettes, not a tourist postcard or famous monument.`,
-    `Cinematic, half-awake memory feel; subtle amber reflection on the window glass,`,
-    `cool blue-teal atmosphere like a long night journey before dawn.`,
-    `Soft atmospheric perspective, no other people, no text, no watermark, no logos.`,
+    `Photorealistic view through an airplane cabin window during landing near ${place}.`,
+    `The scene should look like a realistic high-end travel photograph, not illustration, not anime, not painting.`,
+    `Show terrain and city lights that feel plausible for ${country}: coastline, hills, roads, river, airport approach lights, or low clouds.`,
+    `Outside the window, include a realistic original caped flying superhero near the aircraft,`,
+    `human proportions, believable fabric cape, cinematic lighting, no logos, no chest emblem, not a recognizable copyrighted character.`,
+    `The caped hero emits thin red laser-like eye beams toward the airplane window,`,
+    `with realistic red reflections on the glass and cabin window rim, no broken glass, no damage.`,
+    `Use natural lens depth of field, subtle aircraft window scratches, realistic night air haze,`,
+    `balanced exposure, detailed shadows, documentary realism, no text, no watermark.`,
   ].join(' ');
 }
 export function buildFoodPrompt(city: string, country: string, displayName: string): string {

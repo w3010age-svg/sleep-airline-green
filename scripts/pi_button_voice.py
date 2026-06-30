@@ -177,7 +177,25 @@ def generate_landing_images(flight: dict[str, Any], landing_result: dict[str, An
     arrival = flight.get("arrivalLocation") or "Landing city"
     landing_time = flight.get("landingTime") or ""
 
-    save_landing_image("scenery", landing_result.get("landingScenery"), flight_id)
+    scenery = landing_result.get("landingScenery")
+    if not (scenery or {}).get("imageUrl"):
+        print("Generating landing scenery image...")
+        scenery_result = api_json(
+            "POST",
+            "/api/scenery/generate",
+            {
+                "city": arrival,
+                "country": "",
+                "displayName": arrival,
+                "flightId": flight_id,
+                "passengerId": PASSENGER_ID,
+                "passengerName": PASSENGER_NAME,
+                "groupId": GROUP_ID,
+                "landingTime": landing_time,
+            },
+        )
+        scenery = scenery_result.get("landingScenery")
+    save_landing_image("scenery", scenery, flight_id)
 
     print("Generating local food image...")
     food_result = api_json(
@@ -231,8 +249,8 @@ def handle_button_press() -> None:
                 },
             )
             flight = result.get("flight", {})
-            say_broadcast(flight.get("captainBroadcast", ""), BROADCAST_STYLE)
             generate_landing_images(flight, result)
+            say_broadcast(flight.get("captainBroadcast", ""), BROADCAST_STYLE)
         else:
             print("Taking off...")
             result = api_json(

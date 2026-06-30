@@ -511,6 +511,28 @@ async function refreshProgress() {
     const data = await api('GET', '/api/flight/progress?passengerId=' + encodeURIComponent(passenger.passengerId));
     if (data.activeFlight) {
       activeFlight = data.activeFlight;
+      passenger.status = 'in_flight';
+    } else {
+      activeFlight = null;
+    }
+    updateUI();
+  } catch { /* silent */ }
+}
+
+async function syncPassengerState() {
+  if (!passenger) return;
+  try {
+    const data = await api('POST', '/api/passenger', {
+      passengerId: passenger.passengerId,
+      name: passenger.name,
+      groupId: passenger.groupId,
+    });
+    passenger = data.passenger || passenger;
+    lastLandedFlight = data.lastLandedFlight || null;
+    landingScenery = data.landingScenery || null;
+    landingFood = data.landingFood || null;
+    if (passenger.status === 'in_flight') {
+      await refreshProgress();
     } else {
       activeFlight = null;
     }
@@ -523,11 +545,11 @@ async function refreshProgress() {
 function startAutoRefresh() {
   stopAutoRefresh();
   refreshTimer = setInterval(() => {
-    if (passenger && passenger.status === 'in_flight') {
-      refreshProgress();
+    if (passenger) {
+      syncPassengerState();
       fetchBoard();
     }
-  }, 60000);
+  }, 10000);
 }
 
 function stopAutoRefresh() {
