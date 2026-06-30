@@ -46,6 +46,36 @@ function parseFoodImage(page: Record<string, unknown>): LandingScenery {
   };
 }
 
+async function updateSceneryRowFoodUrl(flightId: string, foodUrl: string): Promise<void> {
+  if (!foodUrl) return;
+
+  const client = getNotionClient();
+  const dbId = await resolveLandscapeDbId();
+  const allowed = await getLandscapePropertyNames();
+  if (!allowed.has('food')) {
+    console.warn('Landing scenery database has no food URL property.');
+    return;
+  }
+
+  const result = await client.databases.query({
+    database_id: dbId,
+    filter: { property: 'Entry ID', title: { equals: `SC-${flightId}` } },
+    sorts: [{ property: 'Created At', direction: 'descending' }],
+    page_size: 1,
+  });
+
+  if (result.results.length === 0) {
+    console.warn(`No scenery row found for food URL update: ${flightId}`);
+    return;
+  }
+
+  await client.pages.update({
+    page_id: result.results[0].id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    properties: { food: wUrl(foodUrl) } as any,
+  });
+}
+
 export async function saveLandingFoodImage(params: {
   flightId: string;
   passengerId: string;
@@ -124,6 +154,10 @@ export async function saveLandingFoodImage(params: {
     });
   }
 
+  if (imageUrl) {
+    await updateSceneryRowFoodUrl(params.flightId, imageUrl);
+  }
+
   return parseFoodImage(fresh as unknown as Record<string, unknown>);
 }
 
@@ -136,6 +170,27 @@ export async function getLandingFoodByFlightId(flightId: string): Promise<Landin
 
   const client = getNotionClient();
   const dbId = await resolveLandscapeDbId();
+
+  const sceneryResult = await client.databases.query({
+    database_id: dbId,
+    filter: { property: 'Entry ID', title: { equals: `SC-${flightId}` } },
+    sorts: [{ property: 'Created At', direction: 'descending' }],
+    page_size: 1,
+  });
+
+  if (sceneryResult.results.length > 0) {
+    const freshScenery = await client.pages.retrieve({ page_id: sceneryResult.results[0].id });
+    const props = (freshScenery as { properties: Record<string, unknown> }).properties;
+    const foodUrl = readUrl(props, 'food');
+    if (foodUrl) {
+      const scenery = parseFoodImage(freshScenery as unknown as Record<string, unknown>);
+      return {
+        ...scenery,
+        entryId: foodEntryId(flightId),
+        imageUrl: foodUrl,
+      };
+    }
+  }
 
   const result = await client.databases.query({
     database_id: dbId,
