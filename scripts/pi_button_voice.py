@@ -16,6 +16,7 @@ import sys
 import tempfile
 import threading
 import time
+from base64 import b64decode
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -54,6 +55,7 @@ BROADCAST_STYLE = os.environ.get("SLEEP_AIRLINE_BROADCAST_STYLE", "flight_attend
 BUTTON_GPIO = int(os.environ.get("SLEEP_AIRLINE_BUTTON_GPIO", "17"))
 REQUEST_TIMEOUT = float(os.environ.get("SLEEP_AIRLINE_REQUEST_TIMEOUT", "120"))
 AUDIO_PLAYER = os.environ.get("SLEEP_AIRLINE_AUDIO_PLAYER", "mpg123")
+IMAGE_OUTPUT_DIR = Path(os.environ.get("SLEEP_AIRLINE_IMAGE_OUTPUT_DIR", ROOT / "pi-output"))
 
 busy_lock = threading.Lock()
 last_press_at = 0.0
@@ -119,6 +121,82 @@ def say_broadcast(text: str, style: str = BROADCAST_STYLE) -> None:
         print(f"Speech playback failed: {err}", file=sys.stderr)
 
 
+def extension_for_content_type(content_type: str) -> str:
+    if "svg" in content_type:
+        return ".svg"
+    if "jpeg" in content_type or "jpg" in content_type:
+        return ".jpg"
+    if "webp" in content_type:
+        return ".webp"
+    return ".png"
+
+
+def safe_name(value: str) -> str:
+    cleaned = "".join(ch.lower() if ch.isalnum() else "-" for ch in value)
+    return "-".join(part for part in cleaned.split("-") if part)[:48] or "landing"
+
+
+def save_image_from_url(kind: str, image_url: str, flight_id: str) -> Path | None:
+    if not image_url:
+        return None
+
+    IMAGE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    stem = f"{kind}-{safe_name(flight_id)}-{int(time.time())}"
+
+    if image_url.startswith("data:"):
+        header, b64 = image_url.split(",", 1)
+        content_type = header.split(";", 1)[0].replace("data:", "")
+        path = IMAGE_OUTPUT_DIR / f"{stem}{extension_for_content_type(content_type)}"
+        path.write_bytes(b64decode(b64))
+        return path
+
+    req = Request(image_url, method="GET")
+    with urlopen(req, timeout=REQUEST_TIMEOUT) as res:
+        content_type = res.headers.get("content-type", "image/png")
+        path = IMAGE_OUTPUT_DIR / f"{stem}{extension_for_content_type(content_type)}"
+        path.write_bytes(res.read())
+        return path
+
+
+def save_landing_image(kind: str, payload: dict[str, Any] | None, flight_id: str) -> None:
+    image_url = (payload or {}).get("imageUrl")
+    if not image_url:
+        print(f"No {kind} image returned.")
+        return
+
+    try:
+        path = save_image_from_url(kind, image_url, flight_id)
+        if path:
+            print(f"Saved {kind} image: {path}")
+    except Exception as err:
+        print(f"Could not save {kind} image: {err}", file=sys.stderr)
+
+
+def generate_landing_images(flight: dict[str, Any], landing_result: dict[str, Any]) -> None:
+    flight_id = flight.get("flightId") or f"pi-{int(time.time())}"
+    arrival = flight.get("arrivalLocation") or "Landing city"
+    landing_time = flight.get("landingTime") or ""
+
+    save_landing_image("scenery", landing_result.get("landingScenery"), flight_id)
+
+    print("Generating local food image...")
+    food_result = api_json(
+        "POST",
+        "/api/food/generate",
+        {
+            "city": arrival,
+            "country": "",
+            "displayName": arrival,
+            "flightId": flight_id,
+            "passengerId": PASSENGER_ID,
+            "passengerName": PASSENGER_NAME,
+            "groupId": GROUP_ID,
+            "landingTime": landing_time,
+        },
+    )
+    save_landing_image("food", food_result.get("landingFood"), flight_id)
+
+
 def handle_button_press() -> None:
     global last_press_at
 
@@ -154,6 +232,7 @@ def handle_button_press() -> None:
             )
             flight = result.get("flight", {})
             say_broadcast(flight.get("captainBroadcast", ""), BROADCAST_STYLE)
+            generate_landing_images(flight, result)
         else:
             print("Taking off...")
             result = api_json(

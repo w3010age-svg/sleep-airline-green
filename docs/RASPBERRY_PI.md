@@ -78,6 +78,7 @@ SLEEP_AIRLINE_ROUTE_DIRECTION=auto
 SLEEP_AIRLINE_BROADCAST_STYLE=flight_attendant
 SLEEP_AIRLINE_BUTTON_GPIO=17
 SLEEP_AIRLINE_AUDIO_PLAYER=mpg123
+SLEEP_AIRLINE_IMAGE_OUTPUT_DIR=pi-output
 ```
 
 如果你是在 Raspberry Pi 本機跑 `npm run dev` 或 `npm start`，可以改成：
@@ -106,8 +107,16 @@ Press Ctrl+C to stop.
 接著按 GPIO17 按鈕：
 
 - 第一次：建立/登入乘客，觸發起飛，播放起飛廣播
-- 第二次：觸發降落，播放降落廣播
+- 第二次：觸發降落，播放降落廣播，並把風景圖/美食圖存到 `pi-output`
 - 再按一次：會重新起飛
+
+看 Raspberry Pi 產生的圖片：
+
+```bash
+ls pi-output
+```
+
+如果你在 Raspberry Pi 桌面環境，可以開檔案管理器到專案資料夾裡的 `pi-output` 看圖片。
 
 ## 6. 開機自動啟動
 
