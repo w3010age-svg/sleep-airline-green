@@ -1,6 +1,8 @@
 node_modules/
 .env
 .env.local
+.env.pi
 .vercel/
 public/cities_data.json
 *.tsbuildinfo
+__pycache__/
